@@ -32,13 +32,25 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.15); /* Much more transparent */
             color: white;
             padding: 20px;
             border-radius: 10px;
             max-width: 350px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px); /* Less blur */
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+            transition: opacity 0.3s ease, background 0.3s ease;
+            opacity: 0.7; /* Semi-transparent by default */
+        }
+
+        #info-panel:hover {
+            background: rgba(0, 0, 0, 0.8); /* Darker on hover */
+            opacity: 1;
+        }
+
+        #info-panel.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         #info-panel h1 {
@@ -69,12 +81,24 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            background: rgba(0, 0, 0, 0.75);
+            background: rgba(0, 0, 0, 0.15); /* Much more transparent */
             color: white;
             padding: 15px;
             border-radius: 10px;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px); /* Less blur */
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); /* Lighter shadow */
+            transition: opacity 0.3s ease, background 0.3s ease;
+            opacity: 0.7; /* Semi-transparent by default */
+        }
+
+        #controls:hover {
+            background: rgba(0, 0, 0, 0.8); /* Darker on hover */
+            opacity: 1;
+        }
+
+        #controls.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         #controls h3 {
@@ -112,21 +136,20 @@
         <canvas id="canvas"></canvas>
         
         <div id="info-panel">
-            <h1>🤖 Biomedical Soft Robot</h1>
-            <p><strong>Magnetite-Derived Magnetic Product</strong></p>
-            
+            <h1>Spreadable Magnetite-Derived Biomedical (And Other) Soft Robot</h1>
+
             <h2>Characteristics:</h2>
             <ul>
-                <li>Miniature bug-like appearance</li>
+                <li>Miniature bug-like/hand-like appearance</li>
                 <li>Spreadable magnetic material</li>
-                <li>AI spectroscopic sensing</li>
-                <li>Universal flexibility</li>
+                <li>AI spectroscopic/photonic sensing</li>
+                <li>The universal formulation - the answer to the lack of the universal formulation in materials classification</li>
             </ul>
             
             <h2>Capabilities:</h2>
             <p>
                 <span class="status-indicator active"></span>
-                <strong>AI Spectroscopic Sensing:</strong> Real-time analysis of surrounding materials and biological tissues
+                <strong>AI Spectroscopic Sensing:</strong> Hypothetically unlimited materials analysis (intended biomedical context, but it begins with my mining context)
             </p>
             <p>
                 <span class="status-indicator active"></span>
@@ -139,9 +162,10 @@
         </div>
 
         <div id="controls">
-            <h3>🎮 Controls</h3>
-            <p>🖱️ <strong>Mouse Move:</strong> Rotate view</p>
-            <p>🔍 <strong>Scroll:</strong> Zoom in/out</p>
+            <h3>Controls</h3>
+            <p><strong>Mouse Move:</strong> Rotate view</p>
+            <p><strong>Scroll:</strong> Zoom in/out</p>
+            <p><strong>Press 'H':</strong> Hide/Show panels</p>
         </div>
     </div>
 
@@ -170,6 +194,17 @@
                 e.preventDefault();
                 zoom += e.deltaY * -0.001;
                 zoom = Math.max(0.5, Math.min(2, zoom));
+            });
+            
+            // Toggle panels with 'H' key (Hide/Show)
+            window.addEventListener('keydown', (e) => {
+                if (e.key.toLowerCase() === 'h') {
+                    const infoPanel = document.getElementById('info-panel');
+                    const controlsPanel = document.getElementById('controls');
+                    
+                    infoPanel.classList.toggle('hidden');
+                    controlsPanel.classList.toggle('hidden');
+                }
             });
             
             window.addEventListener('resize', resize);
@@ -230,31 +265,25 @@
             return project(point);
         }
 
-        // Drawing functions
+        // Drawing functions - SIMPLIFIED FOR TESTING
         function drawSphere(x, y, z, radius, color, rx, ry) {
             const point = transform({x, y, z}, rx, ry);
-            const size = radius * point.size * 50;
+            const size = Math.abs(radius * point.size * 30); // Ensure positive size
             
-            if (point.y > 0 && point.y < height) {
-                const gradient = ctx.createRadialGradient(
-                    point.x, point.y, 0,
-                    point.x, point.y, size
-                );
-                gradient.addColorStop(0, color);
-                gradient.addColorStop(1, 'rgba(0,0,0,0.5)');
-                
-                ctx.fillStyle = gradient;
-                ctx.beginPath();
-                ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
-                ctx.fill();
-            }
+            // Always draw, no filtering
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(point.x, point.y, size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            console.log(`Drawing sphere at (${point.x.toFixed(1)}, ${point.y.toFixed(1)}) size: ${size.toFixed(1)}`);
         }
 
         function drawCylinder(x1, y1, z1, x2, y2, z2, radius, color, rx, ry) {
             const p1 = transform({x: x1, y: y1, z: z1}, rx, ry);
             const p2 = transform({x: x2, y: y2, z: z2}, rx, ry);
             
-            const width = radius * ((p1.size + p2.size) / 2) * 50;
+            const width = Math.abs(radius * ((p1.size + p2.size) / 2) * 30); // Ensure positive width
             
             ctx.strokeStyle = color;
             ctx.lineWidth = width;
@@ -263,6 +292,35 @@
             ctx.moveTo(p1.x, p1.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.stroke();
+            
+            console.log(`Drawing cylinder from (${p1.x.toFixed(1)}, ${p1.y.toFixed(1)}) to (${p2.x.toFixed(1)}, ${p2.y.toFixed(1)}) width: ${width.toFixed(1)}`);
+        }
+
+        function drawOrganicBody(x, y, z, size, rx, ry) {
+            // Draw multiple overlapping spheres to create organic shape
+            const bodyPulse = Math.sin(time * 1.5) * 0.1 + 1;
+            
+            // Main body core (smaller and more transparent)
+            drawSphere(x, y, z, size * bodyPulse, '#2a2a2a', rx, ry);
+            
+            // Organic bulges around the core (smaller)
+            const bulgePulse1 = Math.sin(time * 2 + 0) * 0.03 + 0.97;
+            const bulgePulse2 = Math.sin(time * 2 + Math.PI/2) * 0.03 + 0.97;
+            const bulgePulse3 = Math.sin(time * 2 + Math.PI) * 0.03 + 0.97;
+            const bulgePulse4 = Math.sin(time * 2 + 3*Math.PI/2) * 0.03 + 0.97;
+            
+            drawSphere(x + 0.1, y + 0.05, z + 0.05, size * 0.5 * bulgePulse1, '#323232', rx, ry);
+            drawSphere(x - 0.1, y + 0.05, z - 0.05, size * 0.5 * bulgePulse2, '#323232', rx, ry);
+            drawSphere(x + 0.05, y - 0.05, z - 0.1, size * 0.4 * bulgePulse3, '#323232', rx, ry);
+            drawSphere(x - 0.05, y - 0.05, z + 0.1, size * 0.4 * bulgePulse4, '#323232', rx, ry);
+            
+            // Central nervous system glow
+            const nervePulse = Math.sin(time * 3) * 0.3 + 0.7;
+            drawSphere(x, y, z, size * 0.3, `rgba(79, 195, 247, ${nervePulse * 0.6})`, rx, ry);
+            
+            // Photonic core zones
+            const photonicCore = Math.sin(time * 2.5) * 0.4 + 0.6;
+            drawSphere(x, y + 0.02, z, size * 0.2, `rgba(147, 39, 143, ${photonicCore * 0.8})`, rx, ry);
         }
 
         function drawRobot() {
@@ -271,61 +329,116 @@
             
             const hoverY = Math.sin(time * 2) * 0.1;
             
-            // Draw body parts in order (back to front for proper depth)
+            // Draw appendages first (back to front rendering)
+            const appendages = [
+                {x: 0, y: 0, z: 0, dir: 0, length: 1.2, segments: 5, offset: 0},           // Front
+                {x: 0, y: 0, z: 0, dir: Math.PI/3, length: 1.0, segments: 4, offset: 1},    // Front-right
+                {x: 0, y: 0, z: 0, dir: -Math.PI/3, length: 1.0, segments: 4, offset: 2},   // Front-left
+                {x: 0, y: 0, z: 0, dir: 2*Math.PI/3, length: 0.8, segments: 3, offset: 3},  // Back-right
+                {x: 0, y: 0, z: 0, dir: -2*Math.PI/3, length: 0.8, segments: 3, offset: 4}, // Back-left
+                {x: 0, y: 0, z: 0, dir: Math.PI, length: 0.7, segments: 3, offset: 5},       // Back
+                {x: 0, y: 0, z: 0, dir: Math.PI/6, length: 0.9, segments: 4, offset: 6},     // Additional arm
+                {x: 0, y: 0, z: 0, dir: -Math.PI/6, length: 0.9, segments: 4, offset: 7}     // Additional arm
+            ];
             
-            // Back legs
-            drawLeg(-0.7, -0.4, false, rotationX, rotationY, hoverY);
-            drawLeg(0.7, -0.4, true, rotationX, rotationY, hoverY);
+            // TEMPORARY: Draw simple test appendages to verify they're visible
+            for (let i = 0; i < 8; i++) {
+                const angle = (i / 8) * Math.PI * 2;
+                const x1 = Math.cos(angle) * 0.3;
+                const z1 = Math.sin(angle) * 0.3;
+                const x2 = Math.cos(angle) * 1.2;
+                const z2 = Math.sin(angle) * 1.2;
+                
+                // Draw bright colored test appendages
+                drawCylinder(x1, hoverY, z1, x2, hoverY, z2, 0.1, '#ff0000', rotationX, rotationY); // Bright red
+                drawSphere(x2, hoverY, z2, 0.1, '#00ff00', rotationX, rotationY); // Bright green
+            }
             
-            // Middle legs
-            drawLeg(-0.7, 0, false, rotationX, rotationY, hoverY);
-            drawLeg(0.7, 0, true, rotationX, rotationY, hoverY);
+            appendages.forEach(app => {
+                drawFlexibleAppendage(
+                    app.x, app.y, app.z, 
+                    app.dir, app.length, app.segments, 
+                    rotationX, rotationY, hoverY, app.offset
+                );
+            });
             
-            // Main body
-            drawSphere(0, hoverY, 0, 0.8, '#3a3a3a', rotationX, rotationY);
+            // Organic central body (smaller size)
+            drawOrganicBody(0, hoverY, 0, 0.25, rotationX, rotationY);
             
-            // Front legs
-            drawLeg(-0.7, 0.4, false, rotationX, rotationY, hoverY);
-            drawLeg(0.7, 0.4, true, rotationX, rotationY, hoverY);
+            // Head/sensor cluster
+            drawSphere(0, 0.2 + hoverY, 0.6, 0.15, '#4a4a4a', rotationX, rotationY);
             
-            // Head
-            drawSphere(0, 0.1 + hoverY, 1.0, 0.5, '#4a4a4a', rotationX, rotationY);
-            
-            // Antennae (AI sensors)
-            drawCylinder(-0.2, 0.5 + hoverY, 1.2, -0.3, 0.9 + hoverY, 1.3, 0.02, '#4fc3f7', rotationX, rotationY);
-            drawCylinder(0.2, 0.5 + hoverY, 1.2, 0.3, 0.9 + hoverY, 1.3, 0.02, '#4fc3f7', rotationX, rotationY);
-            
-            // Sensor tips (glowing)
-            drawSphere(-0.3, 0.95 + hoverY, 1.3, 0.08, '#00ffff', rotationX, rotationY);
-            drawSphere(0.3, 0.95 + hoverY, 1.3, 0.08, '#00ffff', rotationX, rotationY);
-            
+            // Main antennae (AI sensors)
+            drawCylinder(-0.05, 0.25 + hoverY, 0.7, -0.1, 0.4 + hoverY, 0.8, 0.02, '#4fc3f7', rotationX, rotationY);
+            drawCylinder(0.05, 0.25 + hoverY, 0.7, 0.1, 0.4 + hoverY, 0.8, 0.02, '#4fc3f7', rotationX, rotationY);
+
+            // Appendages
+            drawAppendages(-0.05, hoverY, 0.25, rotationX, rotationY, -0.1);
+            drawAppendages(0.05, hoverY, 0);
+
             // Magnetic field rings
             drawMagneticField(hoverY, rotationX, rotationY);
         }
 
-        function drawLeg(xPos, zPos, isRight, rx, ry, hoverY) {
-            const side = isRight ? 1 : -1;
-            const legAngle = isRight ? Math.PI / 4 : -Math.PI / 4;
+        function drawFlexibleAppendage(baseX, baseY, baseZ, direction, length, segments, rx, ry, hoverY, timeOffset = 0) {
+            const segmentLength = length / segments;
+            const waveAmplitude = 0.2; // Reduced for better visibility
+            const waveFrequency = 2;
             
-            // Upper leg
-            const x1 = xPos;
-            const y1 = -0.3 + hoverY;
-            const z1 = zPos;
-            const x2 = xPos + side * 0.3;
-            const y2 = -0.7 + hoverY;
-            const z2 = zPos;
+            let currentX = baseX;
+            let currentY = baseY + hoverY;
+            let currentZ = baseZ;
             
-            drawCylinder(x1, y1, z1, x2, y2, z2, 0.08, '#2c2c2c', rx, ry);
+            // Calculate direction vector
+            const dirX = Math.cos(direction);
+            const dirZ = Math.sin(direction);
             
-            // Lower leg
-            const x3 = x2 + side * 0.15;
-            const y3 = -1.0 + hoverY;
-            const z3 = zPos;
+            for (let i = 0; i < segments; i++) {
+                const segmentProgress = i / segments;
+                const wavePhase = time * waveFrequency + timeOffset + segmentProgress * Math.PI;
+                
+                // Add wave motion for flexibility
+                const bendY = Math.sin(wavePhase) * waveAmplitude * segmentProgress;
+                const bendX = Math.cos(wavePhase * 0.7) * waveAmplitude * 0.3 * segmentProgress;
+                
+                // Calculate next segment position
+                const nextX = currentX + dirX * segmentLength + bendX;
+                const nextY = currentY + bendY;
+                const nextZ = currentZ + dirZ * segmentLength;
+                
+                // Dark metallic colors with high visibility
+                const isPhotonicZone = i % 2 === 1;
+                const photonicPulse = Math.sin(time * 3 + timeOffset + i) * 0.5 + 0.5;
+                
+                let segmentColor;
+                if (isPhotonicZone) {
+                    // Bright purple photonic zones
+                    segmentColor = '#9933ff'; // Bright purple
+                } else {
+                    // Dark metallic segments
+                    segmentColor = '#4d4d4d'; // Dark gray metallic
+                }
+                
+                const radius = 0.12; // Larger for better visibility
+                
+                // Draw segment with metallic appearance
+                drawCylinder(currentX, currentY, currentZ, nextX, nextY, nextZ, radius, segmentColor, rx, ry);
+                
+                // Add metallic shine effect
+                drawCylinder(currentX, currentY, currentZ, nextX, nextY, nextZ, radius * 0.7, '#666666', rx, ry);
+                
+                // Draw joint
+                const jointColor = isPhotonicZone ? '#cc66ff' : '#333333';
+                drawSphere(nextX, nextY, nextZ, radius * 1.3, jointColor, rx, ry);
+                
+                // Update position for next segment
+                currentX = nextX;
+                currentY = nextY;
+                currentZ = nextZ;
+            }
             
-            drawCylinder(x2, y2, z2, x3, y3, z3, 0.06, '#2c2c2c', rx, ry);
-            
-            // Foot
-            drawSphere(x3, y3, z3, 0.06, '#2c2c2c', rx, ry);
+            // Draw bright tip sensor
+            drawSphere(currentX, currentY, currentZ, 0.08, '#00ffff', rx, ry);
         }
 
         function drawMagneticField(hoverY, rx, ry) {
@@ -410,22 +523,250 @@
         function animate() {
             time += 0.01;
             
-            // Clear canvas with gradient background
-            const gradient = ctx.createLinearGradient(0, 0, 0, height);
-            gradient.addColorStop(0, '#0a1628');
-            gradient.addColorStop(1, '#1a2642');
-            ctx.fillStyle = gradient;
+            // Clear canvas with SOLID background
+            ctx.fillStyle = '#1a2642';
             ctx.fillRect(0, 0, width, height);
             
-            // Draw grid
-            drawGrid();
+            // BACK TO THE WORKING VERSION with 3D enhancements!
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const robotSize = 100;
             
-            // Draw sensor particles
-            drawParticles();
+            // Enhanced 3D rotation based on mouse (more dramatic)
+            const rotationX = (mouseY - 0) * Math.PI * 0.6; // Vertical tilt
+            const rotationY = (mouseX - 0) * Math.PI * 0.8 + time * 0.1; // Horizontal rotation + auto rotation
+            const rotationZ = Math.sin(time * 0.7) * 0.2; // Slight roll motion
             
-            // Draw robot
-            drawRobot();
+            // Draw robot body - dark metallic magnetite with subtle metallic shine
+            const bodyPulse = Math.sin(time * 1.5) * 0.1 + 0.9;
             
+            // Main magnetite body - dark metallic
+            ctx.fillStyle = `rgba(40, 40, 45, ${bodyPulse})`;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, robotSize * 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Metallic highlight
+            ctx.fillStyle = `rgba(80, 80, 90, ${Math.sin(time * 2) * 0.2 + 0.3})`;
+            ctx.beginPath();
+            ctx.arc(centerX - robotSize * 0.1, centerY - robotSize * 0.1, robotSize * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Inner magnetic core glow (subtle cyan for magnetic field)
+            ctx.fillStyle = `rgba(79, 195, 247, ${Math.sin(time * 2) * 0.2 + 0.1})`;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, robotSize * 0.08, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw 8 appendages with true 3D rotation and sophisticated photonic zones
+            for (let i = 0; i < 8; i++) {
+                const baseAngle = (i / 8) * Math.PI * 2;
+                const animatedAngle = baseAngle + Math.sin(time * 2 + i) * 0.3; // Wave motion
+                
+                // 3D transformation - convert to 3D space then project to 2D
+                const radius = robotSize;
+                let x3d = Math.cos(animatedAngle) * radius;
+                let y3d = Math.sin(animatedAngle) * radius * 0.3; // Flatten slightly
+                let z3d = Math.sin(animatedAngle) * radius * 0.3;
+                
+                // Apply 3D rotations
+                // Rotate around Y axis (left-right rotation)
+                const cosY = Math.cos(rotationY), sinY = Math.sin(rotationY);
+                let newX = x3d * cosY - z3d * sinY;
+                let newZ = x3d * sinY + z3d * cosY;
+                x3d = newX;
+                z3d = newZ;
+                
+                // Rotate around X axis (up-down tilt)
+                const cosX = Math.cos(rotationX), sinX = Math.sin(rotationX);
+                let newY = y3d * cosX - z3d * sinX;
+                newZ = y3d * sinX + z3d * cosX;
+                y3d = newY;
+                z3d = newZ;
+                
+                // Project 3D to 2D with perspective
+                const perspective = 300;
+                const scale = perspective / (perspective + z3d);
+                const projectedX = centerX + x3d * scale;
+                const projectedY = centerY + y3d * scale;
+                
+                // Calculate depth factor for layering effects
+                const depthFactor = (z3d + radius) / (2 * radius); // 0 to 1
+                const perspectiveScale = scale;
+                
+                // Start point (edge of body) in 3D space
+                const bodyRadius = robotSize * 0.3;
+                let startX3d = Math.cos(animatedAngle) * bodyRadius;
+                let startY3d = Math.sin(animatedAngle) * bodyRadius * 0.3;
+                let startZ3d = Math.sin(animatedAngle) * bodyRadius * 0.3;
+                
+                // Apply same rotations to start point
+                newX = startX3d * cosY - startZ3d * sinY;
+                newZ = startX3d * sinY + startZ3d * cosY;
+                startX3d = newX;
+                startZ3d = newZ;
+                
+                newY = startY3d * cosX - startZ3d * sinX;
+                newZ = startY3d * sinX + startZ3d * cosX;
+                startY3d = newY;
+                startZ3d = newZ;
+                
+                const startScale = perspective / (perspective + startZ3d);
+                const startX = centerX + startX3d * startScale;
+                const startY = centerY + startY3d * startScale;
+                
+                // End point with variable lengths
+                const lengthVariation = 0.8 + (i % 3) * 0.15;
+                const endX = centerX + x3d * scale * lengthVariation;
+                const endY = centerY + y3d * scale * lengthVariation;
+                
+                // Draw appendage segments with sophisticated photonic patterns
+                const segments = 6; // More segments for complex patterns
+                for (let seg = 0; seg < segments; seg++) {
+                    const segStart = seg / segments;
+                    const segEnd = (seg + 1) / segments;
+                    
+                    const segStartX = startX + (endX - startX) * segStart;
+                    const segStartY = startY + (endY - startY) * segStart;
+                    const segEndX = startX + (endX - startX) * segEnd;
+                    const segEndY = startY + (endY - startY) * segEnd;
+                    
+                    // Sophisticated photonic zone patterns
+                    const isPhotonic = (seg % 2 === 1) || (seg === 0 && i % 2 === 0); // Complex pattern
+                    const photonicIntensity = Math.sin(time * 4 + i + seg * 2) * 0.4 + 0.6;
+                    const alpha = 0.7 + depthFactor * 0.3; // Depth-based opacity
+                    
+                    if (isPhotonic) {
+                        // Multi-layered photonic zones with varying colors
+                        const hue = (147 + seg * 20 + time * 10) % 360; // Color cycling
+                        const photonicAlpha = photonicIntensity * alpha;
+                        
+                        if (seg % 3 === 0) {
+                            ctx.strokeStyle = `rgba(147, 39, 143, ${photonicAlpha})`; // Purple
+                        } else if (seg % 3 === 1) {
+                            ctx.strokeStyle = `rgba(186, 85, 211, ${photonicAlpha})`; // Violet  
+                        } else {
+                            ctx.strokeStyle = `rgba(138, 43, 226, ${photonicAlpha})`; // Blue-violet
+                        }
+                        
+                        // Add photonic glow effect
+                        ctx.shadowColor = ctx.strokeStyle;
+                        ctx.shadowBlur = 8 * photonicIntensity;
+                    } else {
+                        ctx.strokeStyle = `rgba(45, 45, 50, ${alpha})`; // Dark metallic magnetite
+                        ctx.shadowBlur = 0;
+                    }
+                    
+                    ctx.lineWidth = (14 - seg * 1.8) * perspectiveScale; // Smoother taper
+                    ctx.lineCap = 'round';
+                    ctx.beginPath();
+                    ctx.moveTo(segStartX, segStartY);
+                    ctx.lineTo(segEndX, segEndY);
+                    ctx.stroke();
+                }
+                
+                // Draw sensor tip with 3D perspective
+                const sensorPulse = Math.sin(time * 4 + i) * 0.4 + 0.6;
+                const sensorAlpha = (0.6 + depthFactor * 0.4) * sensorPulse;
+                ctx.fillStyle = `rgba(79, 195, 247, ${sensorAlpha})`;
+                ctx.beginPath();
+                ctx.arc(endX, endY, 8 * perspectiveScale, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Sensor glow
+                if (sensorPulse > 0.8) {
+                    ctx.fillStyle = `rgba(0, 255, 255, ${(sensorPulse - 0.8) * 2 * depthFactor})`;
+                    ctx.beginPath();
+                    ctx.arc(endX, endY, 15 * perspectiveScale, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                
+                // Data streaming visualization - packets flowing from sensors to core
+                const streamingActive = Math.sin(time * 3 + i) > 0.3; // Intermittent data bursts
+                if (streamingActive) {
+                    const numPackets = 3;
+                    for (let packet = 0; packet < numPackets; packet++) {
+                        // Calculate packet position along the appendage (flowing inward)
+                        const packetProgress = ((time * 2 + i + packet * 0.3) % 1);
+                        const packetX = endX + (centerX - endX) * packetProgress;
+                        const packetY = endY + (centerY - endY) * packetProgress;
+                        
+                        // Packet opacity decreases as it approaches center (gets absorbed)
+                        const packetAlpha = (1 - packetProgress) * depthFactor * 0.8;
+                        
+                        // Different data types with different colors
+                        const dataType = (i + packet) % 3;
+                        if (dataType === 0) {
+                            ctx.fillStyle = `rgba(0, 255, 200, ${packetAlpha})`; // Spectroscopic data - cyan
+                        } else if (dataType === 1) {
+                            ctx.fillStyle = `rgba(255, 150, 0, ${packetAlpha})`; // Chemical analysis - orange
+                        } else {
+                            ctx.fillStyle = `rgba(150, 255, 150, ${packetAlpha})`; // Biological signals - green
+                        }
+                        
+                        // Draw data packet
+                        ctx.beginPath();
+                        ctx.arc(packetX, packetY, 3 * perspectiveScale * (1 - packetProgress * 0.5), 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        // Add data packet trail
+                        ctx.strokeStyle = ctx.fillStyle;
+                        ctx.lineWidth = 1;
+                        ctx.globalAlpha = packetAlpha * 0.5;
+                        ctx.beginPath();
+                        const trailLength = 20 * perspectiveScale;
+                        const trailEndX = packetX - (centerX - endX) * 0.1;
+                        const trailEndY = packetY - (centerY - endY) * 0.1;
+                        ctx.moveTo(packetX, packetY);
+                        ctx.lineTo(trailEndX, trailEndY);
+                        ctx.stroke();
+                        ctx.globalAlpha = 1;
+                    }
+                }
+            }
+            
+            // Central data processing visualization
+            ctx.shadowBlur = 0; // Reset shadow
+            const processingIntensity = Math.sin(time * 5) * 0.3 + 0.7;
+            
+            // Data accumulation rings around the core
+            for (let ring = 0; ring < 3; ring++) {
+                const ringRadius = (robotSize * 0.4 + ring * 15) * processingIntensity;
+                const ringAlpha = (1 - ring * 0.3) * processingIntensity * 0.3;
+                
+                ctx.strokeStyle = `rgba(0, 255, 255, ${ringAlpha})`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+            
+            // Real-time data display (simulated sensor readings)
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '12px monospace';
+            ctx.fillText('LIVE SENSOR DATA:', 20, height - 120);
+            
+            // Simulated spectroscopic readings
+            const ph = (7.2 + Math.sin(time * 2) * 0.3).toFixed(1);
+            const temp = (37.1 + Math.sin(time * 1.5) * 0.5).toFixed(1);
+            const glucose = (95 + Math.sin(time * 3) * 15).toFixed(0);
+            const oxygen = (98 + Math.sin(time * 2.5) * 2).toFixed(1);
+            
+            ctx.fillText(`pH: ${ph} | Temp: ${temp}°C`, 20, height - 100);
+            ctx.fillText(`Glucose: ${glucose}mg/dL | O₂: ${oxygen}%`, 20, height - 80);
+            ctx.fillText(`Data Rate: ${(150 + Math.sin(time * 4) * 50).toFixed(0)} packets/sec`, 20, height - 60);
+            
+            // Data flow indicator
+            const dataFlowColor = Math.sin(time * 6) > 0 ? '#00ff00' : '#ffff00';
+            ctx.fillStyle = dataFlowColor;
+            ctx.fillText('DATA STREAMING ACTIVE', 20, height - 40);
+            
+            // Enhanced status display
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.fillText('Magnetite Microrobot - 3D + Photonic + AI Data Streaming!', 20, 30);
+            ctx.fillText(`3D Rotation: X=${rotationX.toFixed(2)} Y=${rotationY.toFixed(2)} Z=${rotationZ.toFixed(2)}`, 20, 50);
+            ctx.fillText('Real-time spectroscopic analysis | Data packets stream | AI-powered photonics', 20, 70);
             requestAnimationFrame(animate);
         }
 
