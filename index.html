@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biomedical Soft Robot Simulation - Dolly's Mechanochemical Robotics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            max-width: 1400px;
+            margin: 20px auto;
+            gap: 20px;
+            padding: 0 20px;
+        }
+        
+        .simulation-panel {
+            flex: 2;
+            min-width: 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .info-panel {
+            flex: 1;
+            min-width: 300px;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            max-height: 700px;
+            overflow-y: auto;
+        }
+        
+        #canvas-container {
+            width: 100%;
+            height: 500px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #667eea;
+        }
+        
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+        }
+        
+        .info-section h3 {
+            color: #667eea;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+        
+        .info-section p, .info-section ul {
+            line-height: 1.6;
+            color: #555;
+            font-size: 14px;
+        }
+        
+        .info-section ul {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .info-section li {
+            margin-bottom: 8px;
+        }
+        
+        .status {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+        
+        .highlight {
+            background: #fff3cd;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🤖 Biomedical Soft Robot Simulation</h1>
+        <p>Dolly's Mechanochemical Robotics - Waste Valorization Applications</p>
+    </div>
+    
+    <div class="container">
+        <div class="simulation-panel">
+            <h2 style="margin-bottom: 15px; color: #667eea;">Soft Robot Visualization</h2>
+            <div id="canvas-container">
+                <canvas id="robotCanvas"></canvas>
+            </div>
+            <div class="controls">
+                <button id="startBtn">▶️ Start Simulation</button>
+                <button id="pauseBtn">⏸️ Pause</button>
+                <button id="resetBtn">🔄 Reset</button>
+                <button id="contractBtn">🔽 Contract</button>
+                <button id="expandBtn">🔼 Expand</button>
+            </div>
+            <div class="status" id="status">
+                Status: Ready to simulate
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="info-section">
+                <h3>About This Simulation</h3>
+                <p>This is a visualization of a <span class="highlight">hypothetical biomedical soft robot</span> designed using principles from waste valorization processes. The robot demonstrates mechanochemical properties that could be achieved through sustainable materials.</p>
+            </div>
+            
+            <div class="info-section">
+                <h3>Waste Valorization Application</h3>
+                <p>This soft robot concept utilizes materials derived from:</p>
+                <ul>
+                    <li><strong>Bio-polymer waste:</strong> Converted into flexible actuators</li>
+                    <li><strong>Organic compounds:</strong> Processed into biodegradable structural components</li>
+                    <li><strong>Recycled materials:</strong> Transformed through mechanochemical processes</li>
+                </ul>
+            </div>
+            
+            <div class="info-section">
+                <h3>Robot Features</h3>
+                <ul>
+                    <li><strong>Soft Actuators:</strong> Flexible segments that can contract and expand</li>
+                    <li><strong>Biocompatibility:</strong> Made from sustainable, non-toxic materials</li>
+                    <li><strong>Adaptive Movement:</strong> Mimics biological systems for smooth motion</li>
+                    <li><strong>Minimal Environmental Impact:</strong> Biodegradable components</li>
+                </ul>
+            </div>
+            
+            <div class="info-section">
+                <h3>Mechanochemical Robotics</h3>
+                <p>Mechanochemical processes enable the transformation of waste materials into functional robotic components through mechanical force and chemical reactions, creating a sustainable approach to robotics engineering.</p>
+            </div>
+            
+            <div class="info-section">
+                <h3>Potential Applications</h3>
+                <ul>
+                    <li>Minimally invasive surgery</li>
+                    <li>Drug delivery systems</li>
+                    <li>Tissue engineering scaffolds</li>
+                    <li>Medical diagnostics</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Canvas setup
+        const canvas = document.getElementById('robotCanvas');
+        const ctx = canvas.getContext('2d');
+        const container = document.getElementById('canvas-container');
+        
+        // Resize canvas to fit container
+        function resizeCanvas() {
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Robot state
+        let animationId = null;
+        let isRunning = false;
+        let time = 0;
+        let contractState = 0;
+        
+        // Robot structure
+        class SoftRobotSegment {
+            constructor(x, y, width, height, phase) {
+                this.x = x;
+                this.y = y;
+                this.baseWidth = width;
+                this.baseHeight = height;
+                this.phase = phase;
+                this.width = width;
+                this.height = height;
+            }
+            
+            update(time, contractState) {
+                const wave = Math.sin(time * 0.05 + this.phase) * 0.2;
+                const contract = contractState * 0.3;
+                this.width = this.baseWidth * (1 + wave - contract);
+                this.height = this.baseHeight * (1 - wave * 0.5 + contract);
+            }
+            
+            draw(ctx) {
+                // Draw soft segment with gradient
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.width
+                );
+                gradient.addColorStop(0, '#ff6b9d');
+                gradient.addColorStop(0.5, '#c06c84');
+                gradient.addColorStop(1, '#6c5b7b');
+                
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.width, this.height, 0, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Add outline
+                ctx.strokeStyle = '#4a4a4a';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                // Add texture lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                ctx.lineWidth = 1;
+                for (let i = -this.height; i <= this.height; i += 10) {
+                    ctx.beginPath();
+                    ctx.moveTo(this.x - this.width, this.y + i);
+                    ctx.lineTo(this.x + this.width, this.y + i);
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Create robot segments
+        const segments = [];
+        const numSegments = 6;
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+        
+        function initializeRobot() {
+            segments.length = 0;
+            const segmentSpacing = 80;
+            for (let i = 0; i < numSegments; i++) {
+                const y = centerY - (numSegments * segmentSpacing / 2) + (i * segmentSpacing);
+                segments.push(new SoftRobotSegment(centerX, y, 60, 30, i * Math.PI / 3));
+            }
+        }
+        
+        initializeRobot();
+        
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background grid
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < canvas.width; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(i, 0);
+                ctx.lineTo(i, canvas.height);
+                ctx.stroke();
+            }
+            for (let i = 0; i < canvas.height; i += 30) {
+                ctx.beginPath();
+                ctx.moveTo(0, i);
+                ctx.lineTo(canvas.width, i);
+                ctx.stroke();
+            }
+            
+            // Update and draw segments
+            segments.forEach(segment => {
+                segment.update(time, contractState);
+                segment.draw(ctx);
+            });
+            
+            // Draw connectors between segments
+            ctx.strokeStyle = '#355c7d';
+            ctx.lineWidth = 3;
+            for (let i = 0; i < segments.length - 1; i++) {
+                ctx.beginPath();
+                ctx.moveTo(segments[i].x, segments[i].y + segments[i].height);
+                ctx.lineTo(segments[i + 1].x, segments[i + 1].y - segments[i + 1].height);
+                ctx.stroke();
+            }
+            
+            // Draw center line
+            ctx.strokeStyle = 'rgba(102, 126, 234, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(centerX, 0);
+            ctx.lineTo(centerX, canvas.height);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            if (isRunning) {
+                time++;
+                animationId = requestAnimationFrame(animate);
+            }
+        }
+        
+        // Control functions
+        function startSimulation() {
+            if (!isRunning) {
+                isRunning = true;
+                document.getElementById('status').textContent = 'Status: Simulation running...';
+                animate();
+            }
+        }
+        
+        function pauseSimulation() {
+            isRunning = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            document.getElementById('status').textContent = 'Status: Paused';
+        }
+        
+        function resetSimulation() {
+            pauseSimulation();
+            time = 0;
+            contractState = 0;
+            initializeRobot();
+            animate();
+            document.getElementById('status').textContent = 'Status: Reset complete';
+        }
+        
+        function contractRobot() {
+            contractState = Math.min(1, contractState + 0.1);
+            if (!isRunning) animate();
+            document.getElementById('status').textContent = `Status: Contract level ${Math.round(contractState * 100)}%`;
+        }
+        
+        function expandRobot() {
+            contractState = Math.max(0, contractState - 0.1);
+            if (!isRunning) animate();
+            document.getElementById('status').textContent = `Status: Contract level ${Math.round(contractState * 100)}%`;
+        }
+        
+        // Event listeners
+        document.getElementById('startBtn').addEventListener('click', startSimulation);
+        document.getElementById('pauseBtn').addEventListener('click', pauseSimulation);
+        document.getElementById('resetBtn').addEventListener('click', resetSimulation);
+        document.getElementById('contractBtn').addEventListener('click', contractRobot);
+        document.getElementById('expandBtn').addEventListener('click', expandRobot);
+        
+        // Initial draw
+        animate();
+        
+        // Auto-resize on window resize
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initializeRobot();
+            animate();
+        });
+    </script>
+</body>
+</html>
