@@ -4,20 +4,6 @@ Biomedical Soft Robot Simulation Viewer
 
 3D browser-based simulation of a hypothetical biomedical soft robot with magnetite-derived magnetic properties and proposed AI spectroscopic/photonic sensing capabilities - the universal formulation.
 
-Features
-
-**3D Visualization**: Real-time 3D rendering of the soft robot with bug-like appearance
-**Interactive Controls**: Rotate, pan, and zoom to explore the robot from all angles
-**Magnetite Material**: Dark metallic appearance representing the spreadable magnetic product
-**AI Spectroscopic Sensing**: Visualized through animated sensor particles and glowing antenna sensors
-**Magnetic Field Visualization**: Animated magnetic field rings showing the robot's magnetic properties
-**Miniature Bug-like Design**: Six-legged structure with articulated segments
-
-### How to Use
-
-1. Open `index.html` in a modern web browser (Chrome, Firefox, Safari, or Edge)
-2. The 3D simulation will load automatically
-
 ### Robot Specifications
 
 **Physical Characteristics:**
